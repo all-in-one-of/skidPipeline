@@ -136,7 +136,7 @@ def loadRenderSettings(context,*args): # Argument must be json file name
 		prefs.loadGlobalPreset(context)
 		cmds.inViewMessage(amg='Render settings preset <hl>'+context+'</hl> successfuly loaded.',pos='midCenter',fade=True)
 	except EnvironmentError:
-		commonTools.areeeeett()
+		areeeeett()
 		cmds.warning('File '+context+'.json does not exist')
 
 def initCam():
