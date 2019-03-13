@@ -109,66 +109,57 @@ def playblastAnim(*args):
 	from os import startfile
 	startfile(playblastPath)
 
-def publishAnimations(riggedAssets,*args):
-	'''This will automatically backup any previously published animation, make a 
-	playblast of the timeline and export any animated asset and shot camera in the scene '''
-	cmds.loadPlugin( 'AbcExport.mll' )
-	from shutil import copyfile
-	import glob
-	end = cmds.playbackOptions(q=True,max=True)
-	confirm = cmds.confirmDialog( title='Publish Animations', \
-		message='This will replace any animation previously published for this shot \nCurrent frame range is : 1001 to %s' %end, \
-		button=['Continue','Abort'], defaultButton='Continue', cancelButton='Abort', dismissString='Abort' )
+def publishAnimations(*args):
+	'''This will publish the current working rig with selected sets in maya 
+	standalone and automatically backup any previously published animation'''
+	import subprocess
+
+	selectionSets = cmds.ls(selection=True)
+
+	# Check if save has unsaved changes
+	if cmds.file(q=True,modified=True) :
+		cmds.warning('Save your scene before publishing')
+		ret
+
+	# Check something is selected
+	if not selectionSets :
+		cmds.warning('Nothing is selected')
+		return
+
+	# Check only one asset is selected
+	ns = []
+	for i in selectionSets :
+		i = i.split(':')[0]
+		ns.append(i)
+	ns = list(dict.fromkeys(ns))
+	if len(ns) > 1 :
+		cmds.warning('Selection sets from different assets are selected')
+		return
+
+	# Deduce asset
+	asset = ns[0].split('_')[0]
+
+	# prepare confirm dialog
+	frameRange = str(cmds.playbackOptions(q=True,ast=True)) + '-' + str(cmds.playbackOptions(q=True,aet=True))
+	sceneFile = cmds.file(query=True,sceneName=True)
+
+	# confirm dialog
+	confirm = cmds.confirmDialog( title='Publish Animation', \
+		message='This will replace any previously published animation. Check your parameters : \n\nSCENE FILE :\n %s \n\nASSET : \n%s \n\nSELECTION SETS : \n%s \n\nFRAME RANGE : \n%s' %(sceneFile,asset,selectionSets,frameRange), \
+		button=['Continue','Cancel'], defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel' )
 	if confirm != 'Continue':
-		pass
-	else :
-		# create backup folder if doesnt exist
-		shotsPath = '//Merlin/3d4/skid/05_shot'
-		abcPath = os.path.abspath(os.path.join(shotsPath,commonTools.currentShot(),'abc'))
-		animationBackupPath = os.path.join(abcPath,'backup',commonTools.todaysDate())
-		if not os.path.exists(animationBackupPath):
-			os.makedirs(animationBackupPath)
-		# backup already published to date folder
-		abcFiles = glob.glob('%s/*.abc' %abcPath)
-		for file in abcFiles :
-			srcPath = file
-			dstPath = os.path.join(animationBackupPath,os.path.split(file)[1])
-			copyfile(srcPath,dstPath)
-		# do playblast
-		cmds.select(clear=True)
-		playblastAnim()
-		# list assets that are present in this shot
-		toExport = []
-		for asset in riggedAssets :
-			if cmds.objExists(asset+':'+asset+'_grp') == True:
-				toExport.append(asset)
-		# export des assets
-		for asset in toExport :
-			cmds.select(asset+':'+asset+'_grp',r=True)
-			
-			exportPath = os.path.abspath(os.path.join(abcPath,asset))
-			# cette putain de fonction qui marche pas en python
-			sel = cmds.ls(selection=True,l=True)
-			start = str(1001)
-			end = str(cmds.playbackOptions(q=True,max=True))
-			root = str(sel[0])
-			save_name = str('%s.abc' %exportPath)
-			# putain de commande completement petee merci l api maya
-			command = "-frameRange " + start + " " + end +" -attrPrefix rman__torattr -attrPrefix rman__riattr -attrPrefix rman_emitFaceIDs -stripNamespaces -uvWrite -writeColorSets -writeFaceSets -worldSpace -writeVisibility -eulerFilter -autoSubd -writeUVSets -dataFormat ogawa -root " + root + " -file " + save_name
-			cmds.AbcExport(j=command)
-			print '%s has been exported successfuly (probably)' %asset
-		
-		# export de la camera
-		cmds.select(commonTools.currentShot(),r=True)
-		exportPath = os.path.abspath(os.path.join(abcPath,commonTools.currentShot()))
-		sel = cmds.ls(selection=True,l=True)
-		start = str(1001)
-		end = str(cmds.playbackOptions(q=True,max=True))
-		root = str(sel[0])
-		save_name = str('%s.abc' %exportPath)
-		command = "-frameRange " + start + " " + end +" -attrPrefix rman__torattr -attrPrefix rman__riattr -attrPrefix rman_emitFaceIDs -stripNamespaces -uvWrite -writeColorSets -writeFaceSets -worldSpace -writeVisibility -eulerFilter -autoSubd -writeUVSets -dataFormat ogawa -root " + root + " -file " + save_name
-		cmds.AbcExport(j=command)
-		print '%s has been exported successfuly (probably)' %commonTools.currentShot()
+		return
+
+	# fire mayapy
+	publishScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/mayapy/publishAnim.py'
+	# resolvedSelectionSets = ''
+	# for i in selectionSets :
+	# 	resolvedSelectionSets = resolvedSelectionSets + ' ' + i
+	# subprocess.call('mayapy "%s" %s %s%s'%(publishScript,sceneFile,asset,resolvedSelectionSets))
+	# print resolvedSelectionSets
+	subprocess.Popen(['mayapy',publishScript,sceneFile,asset]+selectionSets)
+
+
 
 def constraintCar(asset,*args):
 	constraints = ['FR','FL','RR','RL']

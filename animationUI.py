@@ -108,16 +108,16 @@ def CreateUI(*args):
 							reload(animationTools); \
 							animationTools.playblastAnim()')
 			
-				# with frameLayout('Export'):
+				with frameLayout('Export'):
 				# 	with columnLayout():
 				# 		button(l='Export Selected', \
 				# 			c='import animationTools; \
 				# 			reload(animationTools); \
 				# 			animationTools.exportAbcRfM()')
-				# 		button(l='Publish Animations', \
-				# 		c='import animationTools; \
-				# 		reload(animationTools); \
-				# 		animationTools.publishAnimations(%s)' % riggedAssets)
+						button(l='Publish Animation', \
+						c='import animationTools; \
+						reload(animationTools); \
+						animationTools.publishAnimations()')
 
 				with frameLayout('Nomenclatures'):
 						button(l='Afficher nomenclatures',h=30, \
