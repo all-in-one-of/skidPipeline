@@ -224,15 +224,63 @@ def importForest(*args):
 
 	ribFile = scenePath + '/geo/' + shotName + '_forest.rib'
 
+	# 1. Check if exists
 	if not os.path.exists(ribFile) :
 		cmds.warning('Could not find ' + ribFile)
-	else :
-		# Maya sucks so much that they included the import keyword in their command
-		mel.eval('file -import -type "RIB"  -ignoreVersion -ra true -mergeNamespacesOnClash false -namespace "%s_forest"  -pr  -importTimeRange "combine" "%s";'%(shotName,ribFile))
-		cmds.group(shotName+'_forest',n='FOREST_GRP')
+		return
+	if cmds.objExists('FOREST_GRP') :
+		cmds.delete('FOREST_GRP')
+	
+	# 2. import and group
+	mel.eval('file -import -type "RIB"  -ignoreVersion -ra true -mergeNamespacesOnClash false -namespace "%s_forest"  -pr  -importTimeRange "combine" "%s";'%(shotName,ribFile))
+	cmds.group(shotName+'_forest',n='FOREST_GRP')
+
+	# 3. set render stats
+	cmds.setAttr(shotName+'_forestShape.visibleInReflections',1)
+	cmds.setAttr(shotName+'_forestShape.visibleInRefractions',1)
+
+		
+
+def importLightRig(*args) :
+	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
+	scenePath = scenePath.replace(os.sep, '/')
+	sceneName = os.path.split(scenePath)[1]
+	cam = sceneName + ':' + sceneName
+	lightRig = '//Merlin/3d4/skid/04_asset/SkidLibrary/LIGHTRIG/lightRig.ma'
+	ns = 'lightRig'
+	nodes = ['refSphere_grey018_MAT','refSphere_chrome_MAT','LIGHTING_GRP','refSpheres_GRP']
+
+	if not cmds.objExists(cam) :
+		cmds.warning('Shot camera not found. Should be ' + cam)
+		return
+	if not os.path.exists(lightRig) :
+		cmds.warning('lightRig scene not found. Should be ' + lightRig)
+		return
+	for i in nodes :
+		if cmds.objExists(ns+':'+i) :
+			cmds.delete(ns+':'+i)
+
+	if cmds.namespace(exists=ns):
+		cmds.namespace(rm=ns,mergeNamespaceWithRoot=True)
 
 
-# rename
+	# 1. import lightRig.ma
+	cmds.file(lightRig,i=True,type='mayaAscii',ignoreVersion=True,gl=True,ns=ns)
+
+	# 2. parent refSpheres under shot camera
+	cmds.matchTransform(ns + ':refSpheres_GRP',cam)
+	cmds.parent(ns + ':refSpheres_GRP',cam)
+	cmds.setAttr(ns + ':refSpheres_GRP.translateZ',-300)
+
+	# 2. Place Distant light
+	cmds.parent(ns + ':PxrDistantLight_LGT',cam)
+	cmds.setAttr(ns + ':PxrDistantLight_LGT.translate',0,0,-300) 
+	cmds.parent(ns + ':PxrDistantLight_LGT',ns + ':LIGHTING_GRP')
+	cmds.setAttr(ns + ':PxrDistantLight_LGT.rotate',-30.212,-130.481,0)
+
+	# 3. Select ctrl
+	cmds.select(ns + ':refSpheres_CTRL',r=True)
+
 
 def autoBias(auto,*args): # Argument must be boolean
 	sel = cmds.ls(selection=True)
@@ -253,6 +301,7 @@ def autoBias(auto,*args): # Argument must be boolean
 		cmds.inViewMessage( \
 			amg='Trace Bias divided by 10 for %s objects. Check script editor for values' % (len(sel)), \
 			pos='midCenter',fade=True )
+
 
 def motionSamples(inherit,*args): # Argument must be boolean
 	sel = cmds.ls(selection=True)

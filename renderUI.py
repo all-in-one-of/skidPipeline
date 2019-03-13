@@ -5,10 +5,15 @@ from pymel.core import *
 
 # ****************************************** G L O B A L S ******************************************
 
-pathTracerPreset = 'SKID_shot_PathTracer.json'
+pathTracerPreset = 'SKID_shot_PathTracer'
 unifiedPreset = '.json'
+hdri_folder = os.path.abspath('//Merlin/3d4/skid/04_asset/SkidLibrary/LIGHTRIG/HDR')
+hdri_files = os.listdir(hdri_folder)
 
 # ****************************************** I N T E R F A C E ******************************************
+def chooseHDRfile(item,*args):
+	resolveHDRpath = os.path.join(hdri_folder,item)
+	cmds.setAttr('lightRig:PxrDomeLight_LGT.lightColorMap','%s' %resolveHDRpath,type='string')
 
 def CreateUI(*args):
 	# Load Renderman and check version
@@ -24,7 +29,7 @@ def CreateUI(*args):
 		template.define(button, w=300, h=35, align='left')
 		template.define(frameLayout, borderVisible=True, labelVisible=True)
 		template.define(rowColumnLayout,numberOfColumns=2)
-		template.define(optionMenu,w=200)
+		template.define(optionMenu,h=35,w=300)
 
 		try :
 			deleteUI('renderWindow')
@@ -69,6 +74,16 @@ def CreateUI(*args):
 									c='import renderTools; \
 									reload(renderTools); \
 									renderTools.importForest()')
+
+							with columnLayout():
+								button(l='Import Lighting Rig', \
+									c='import renderTools; \
+									reload(renderTools); \
+									renderTools.importLightRig()')
+								optionMenu(changeCommand=chooseHDRfile)
+								for file in hdri_files:
+									menuItem(label=file)
+								
 
 						with frameLayout('Import'):
 							with columnLayout():
