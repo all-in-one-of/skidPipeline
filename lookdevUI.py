@@ -9,7 +9,7 @@ from pymel.core import *
 lookdevScenePath = os.path.abspath('//merlin/3d4/skid/09_dev/toolScripts/lookdev/lookdevSetup/LookdevSetup.ma')
 hdri_folder = os.path.abspath('//Merlin/3d4/skid/04_asset/SkidLibrary/HDRI')
 hdri_files = os.listdir(hdri_folder)
-hdriTurnGrp = '|LookdevSetup:GRP_LookdevSetup|LookdevSetup:GRP_LIGHTING|LookdevSetup:GRP_HDRI'
+hdriTurnGrp = 'LookdevSetup:NEWBIE_TOOLS_GRP'
 turnLocator = 'turn_locator'
 grpName = 'LookdevSetup:GRP_LookdevSetup'
 lookdevPreset = 'SKID_LookdevSetup'

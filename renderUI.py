@@ -69,7 +69,7 @@ def CreateUI(*args):
 								button(l='Import shot casting', \
 									c='import renderTools; \
 									reload(renderTools); \
-									renderTools.readCasting()')
+									renderTools.readCasting()',en=False)
 								button(l='Import shot forest', \
 									c='import renderTools; \
 									reload(renderTools); \

@@ -157,7 +157,8 @@ def createInstancer(*args):
 	'propsGrass/propsGrass_C_clean.ma', \
 	'propsFir/propsFir_A.ma', \
 	'propsFir/propsFir_B.ma', \
-	'propsFir/propsFir_C.ma', \
+	'propsPine/propsPine_B.ma', \
+	'propsPine/propsPine_C.ma', \
 	]
 
 	# Import assets

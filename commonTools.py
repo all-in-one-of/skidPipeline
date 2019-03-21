@@ -135,6 +135,7 @@ def loadRenderSettings(context,*args): # Argument must be json file name
 	try :
 		prefs.loadGlobalPreset(context)
 		cmds.inViewMessage(amg='Render settings preset <hl>'+context+'</hl> successfuly loaded.',pos='midCenter',fade=True)
+		cmds.setAttr('PxrPathTracer.allowCaustics',1)
 	except EnvironmentError:
 		areeeeett()
 		cmds.warning('File '+context+'.json does not exist')

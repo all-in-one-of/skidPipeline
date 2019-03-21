@@ -35,79 +35,89 @@ def exportAbcRfM(*args):
 
 def playblastAnim(*args):
 	'''This will make a playblast of the timeline and version it'''
-	#check if version already has playblast
 	sceneFullName = cmds.file(q=1,sn=1,shn=1)
 	videoPath = os.path.abspath(cmds.workspace(sn=True,q=True)+'/video/'+sceneFullName)
 	playblastPath = videoPath.split('.ma')
 	playblastPath = playblastPath[0]
 	playblastPath = os.path.abspath(playblastPath)+'.mov'
 	playblastPath = os.path.abspath(playblastPath)
+
+	# 1. check if version already has playblast
 	if os.path.isfile(playblastPath):
 		confirm = cmds.confirmDialog (title='Playblast', \
-			message= 'A playblast already exists for this version. Do you want to replace it?', \
-			button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No' )
-		if confirm == 'Yes':
-			pass
-		else:
+			message= 'A playblast already exists for this version. Replace ?', \
+			button=['Conitnue','Cancel'], defaultButton='Conitnue', cancelButton='Cancel', dismissString='Cancel' )
+		if confirm != 'Conitnue':
 			sys.exit()
-	else:
-		pass
 
-	#_____Pre_____
+	# 2. Set a number of attributes before playblast
+	cmds.refresh(suspend=True) # Pause viewport
 	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
 	sceneName = os.path.split(scenePath)
-	# shotCameraName = sceneName[1]
-	completeName = sceneName[1]
-	# cmds.select(shotCameraName + ':' + shotCameraName)
-	# completeName = shotCameraName + ':' + shotCameraName
-	# On garde en memoire les reglages de camera pour les resetter en post
-	camDFG = cmds.getAttr(completeName+'.displayFilmGate')
-	camDR = cmds.getAttr(completeName+'.displayResolution')
-	camDGM = cmds.getAttr(completeName+'.displayGateMask')
-	camOS = cmds.getAttr(completeName+'.overscan')
-	#On les set pour le playblast
-	cmds.setAttr(completeName+'.displayFilmGate',0)
-	cmds.setAttr(completeName+'.displayResolution',0)
-	cmds.setAttr(completeName+'.displayGateMask',0)
-	camDriven = cmds.listConnections(completeName+'.overscan',plugs=True)
+	shotCam = sceneName[1]
+	# Keep camera attributes to reset them after playblast
+	camDFG = cmds.getAttr(shotCam+'.displayFilmGate')
+	camDR = cmds.getAttr(shotCam+'.displayResolution')
+	camDGM = cmds.getAttr(shotCam+'.displayGateMask')
+	camOS = cmds.getAttr(shotCam+'.overscan')
+	# Set attributes
+	cmds.setAttr(shotCam+'.displayFilmGate',0)
+	cmds.setAttr(shotCam+'.displayResolution',0)
+	cmds.setAttr(shotCam+'.displayGateMask',0)
+	# Fix camera overscan
+	camDriven = cmds.listConnections(shotCam+'.overscan',plugs=True)
 	if camDriven != None:
 		for i in camDriven :
-			cmds.disconnectAttr(i,completeName+'.overscan')
-	else:
-		pass
-	# cmds.setAttr(completeName+'.overscan',l=False)
-	cmds.setAttr(completeName+'.overscan',1)
+			cmds.disconnectAttr(i,shotCam+'.overscan')
+	cmds.setAttr(shotCam+'.overscan',1)
 	cmds.setAttr("hardwareRenderingGlobals.multiSampleEnable",1)
 	cmds.setAttr('hardwareRenderingGlobals.multiSampleCount',16)
-	# cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",1)
-	cmds.setAttr('hardwareRenderingGlobals.motionBlurSampleCount',32)
-	mel.eval('setObjectDetailsVisibility(0);') #Desactive Object Details
-	mel.eval('setCameraNamesVisibility(1);') #Active Camera Name
-	mel.eval('setCurrentFrameVisibility(1);') #Active Current Frame
-	mel.eval('setFocalLengthVisibility(1);') #Active longueur focale
-
-	#Playblast
-	cmds.playblast(format="qt",filename=playblastPath,forceOverwrite=True, \
-		sequenceTime=0,clearCache=1,viewer=0,showOrnaments=1,offScreen=True, \
-		fp=4,percent=100,compression="H.264",quality=100,widthHeight=[2048,858])
-
-
-	#Post
-	cmds.setAttr(completeName+'.displayFilmGate',camDFG)
-	cmds.setAttr(completeName+'.displayResolution',camDR)
-	cmds.setAttr(completeName+'.displayGateMask',camDGM)
-	cmds.setAttr(completeName+'.overscan',camOS)
-
-	cmds.setAttr("hardwareRenderingGlobals.multiSampleEnable",1)
-	cmds.setAttr('hardwareRenderingGlobals.multiSampleCount',8)
 	cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",0)
+	cmds.setAttr('hardwareRenderingGlobals.motionBlurSampleCount',16)
+	mel.eval('setObjectDetailsVisibility(0);') # Desactive Object Details
+	mel.eval('setCameraNamesVisibility(1);') # Active Camera Name
+	mel.eval('setCurrentFrameVisibility(1);') # Active Current Frame
+	mel.eval('setFocalLengthVisibility(1);') # Active longueur focale
+	# Viewport hide all but geometries
+	viewport = cmds.getPanel(withFocus=True)
+	cmds.modelEditor(viewport,e=1,allObjects=0)
+	cmds.modelEditor(viewport,e=1,pluginObjects=('gpuCacheDisplayFilter',1),polymeshes=1)
+
+
+	# Do playblast
+	cmds.playblast(format="qt", \
+		filename=playblastPath, \
+		forceOverwrite=True, \
+		sequenceTime=0, \
+		clearCache=1, \
+		viewer=0, \
+		showOrnaments=1, \
+		offScreen=True, \
+		fp=4, \
+		percent=100, \
+		compression="H.264", \
+		quality=100, \
+		widthHeight=[2048,858])
+
+
+	# Reset attributes
+	cmds.setAttr(shotCam+'.displayFilmGate',camDFG)
+	cmds.setAttr(shotCam+'.displayResolution',camDR)
+	cmds.setAttr(shotCam+'.displayGateMask',camDGM)
+	cmds.setAttr(shotCam+'.overscan',camOS)
+
+	cmds.setAttr("hardwareRenderingGlobals.multiSampleEnable",0)
+	cmds.setAttr('hardwareRenderingGlobals.multiSampleCount',8)
+	# cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",0)
 	cmds.setAttr('hardwareRenderingGlobals.motionBlurSampleCount',4)
 	cmds.currentTime('1001')
 	cmds.select(clear=True)
-	
-	#Play playblast
-	from os import startfile
-	startfile(playblastPath)
+	# Unpause viewport
+	cmds.modelEditor(viewport,e=1,allObjects=1)
+	cmds.refresh(suspend=False)
+
+	# Read playblast
+	os.startfile(playblastPath)
 
 def publishAnimations(*args):
 	'''This will publish the current working rig with selected sets in maya 
