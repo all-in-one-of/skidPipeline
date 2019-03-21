@@ -52,7 +52,7 @@ def CreateUI(*args):
 						button(l='Publish shot casting',\
 							c='import setDressTools; \
 							reload(setDressTools); \
-							setDressTools.writeCasting()')
+							setDressTools.writeCasting()',en=False)
 
 
 				with frameLayout('Nomenclatures'):
