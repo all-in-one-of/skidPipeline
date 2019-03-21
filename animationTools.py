@@ -33,21 +33,28 @@ def exportAbcRfM(*args):
 		import maya.utils
 		maya.utils.executeDeferred('''maya.cmds.loadPlugin('RenderMan_for_Maya.py')''')
 
-def playblastAnim(*args):
-	'''This will make a playblast of the timeline and version it'''
+def playblastAnim(publish,*args):
+	'''This will make a playblast of the timeline and version it
+	publish must be a boolean'''
 	sceneFullName = cmds.file(q=1,sn=1,shn=1)
 	videoPath = os.path.abspath(cmds.workspace(sn=True,q=True)+'/video/'+sceneFullName)
-	playblastPath = videoPath.split('.ma')
-	playblastPath = playblastPath[0]
-	playblastPath = os.path.abspath(playblastPath)+'.mov'
-	playblastPath = os.path.abspath(playblastPath)
+	if publish == False:
+		playblastPath = videoPath.split('.ma')
+		playblastPath = playblastPath[0]
+		playblastPath = os.path.abspath(playblastPath)+'.mov'
+		playblastPath = os.path.abspath(playblastPath)
+	else :
+		editDir = '//merlin/3D4/skid/07_editing/input/03_spline/'
+		scenePath = cmds.workspace(sn=True,q=True)
+		sceneName = os.path.split(scenePath)[1]
+		playblastPath = editDir + sceneName + '/' + sceneName
 
 	# 1. check if version already has playblast
-	if os.path.isfile(playblastPath):
+	if os.path.isfile(playblastPath) or os.path.isfile(playblastPath+'.1001.jpg'):
 		confirm = cmds.confirmDialog (title='Playblast', \
 			message= 'A playblast already exists for this version. Replace ?', \
-			button=['Conitnue','Cancel'], defaultButton='Conitnue', cancelButton='Cancel', dismissString='Cancel' )
-		if confirm != 'Conitnue':
+			button=['Continue','Cancel'], defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel' )
+		if confirm != 'Continue':
 			sys.exit()
 
 	# 2. Set a number of attributes before playblast
@@ -85,19 +92,35 @@ def playblastAnim(*args):
 
 
 	# Do playblast
-	cmds.playblast(format="qt", \
-		filename=playblastPath, \
-		forceOverwrite=True, \
-		sequenceTime=0, \
-		clearCache=1, \
-		viewer=0, \
-		showOrnaments=1, \
-		offScreen=True, \
-		fp=4, \
-		percent=100, \
-		compression="H.264", \
-		quality=100, \
-		widthHeight=[2048,858])
+	if publish == False :
+		cmds.playblast(format="qt", \
+			filename=playblastPath, \
+			forceOverwrite=True, \
+			sequenceTime=0, \
+			clearCache=1, \
+			viewer=0, \
+			showOrnaments=1, \
+			offScreen=True, \
+			fp=4, \
+			percent=100, \
+			compression="H.264", \
+			quality=100, \
+			widthHeight=[2048,858])
+	else :
+		cmds.playblast(format="image", \
+			filename=playblastPath, \
+			forceOverwrite=True, \
+			sequenceTime=0, \
+			clearCache=1, \
+			viewer=0, \
+			showOrnaments=1, \
+			offScreen=True, \
+			fp=4, \
+			percent=100, \
+			compression="jpg", \
+			quality=100, \
+			widthHeight=[2048,858])
+		
 
 
 	# Reset attributes
@@ -117,7 +140,8 @@ def playblastAnim(*args):
 	cmds.refresh(suspend=False)
 
 	# Read playblast
-	os.startfile(playblastPath)
+	if publish == False :
+		os.startfile(playblastPath)
 
 def publishAnimations(*args):
 	'''This will publish the current working rig with selected sets in maya 

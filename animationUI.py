@@ -106,7 +106,11 @@ def CreateUI(*args):
 						button(l='Playblast Animation', \
 							c='import animationTools; \
 							reload(animationTools); \
-							animationTools.playblastAnim()')
+							animationTools.playblastAnim(False)')
+						button(l='Publish Playblast', \
+							c='import animationTools; \
+							reload(animationTools); \
+							animationTools.playblastAnim(True)')
 			
 				with frameLayout('Export'):
 				# 	with columnLayout():
