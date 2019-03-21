@@ -151,19 +151,41 @@ def createInstancer(*args):
 	''' The following assets must be in the same order that was specified in Houdini
 	First line corresponds to index 0, next line index 1 and so on...'''
 	toImport = [ \
-	'propsPine/propsPine_A.ma', \
-	'propsGrass/propsGrass_A_clean.ma', \
-	'propsGrass/propsGrass_B_clean.ma', \
-	'propsGrass/propsGrass_C_clean.ma', \
-	'propsFir/propsFir_A.ma', \
-	'propsFir/propsFir_B.ma', \
-	'propsPine/propsPine_B.ma', \
-	'propsPine/propsPine_C.ma', \
+	'propsPine/propsPine_A', #0
+	'propsGrass/propsGrass_A_clean', #1
+	'propsGrass/propsGrass_B_clean', #2
+	'propsGrass/propsGrass_C_clean', #3
+	'propsFir/propsFir_A', #4
+	'propsFir/propsFir_B', #5
+	'propsPine/propsPine_B', #6
+	'propsPine/propsPine_C', #7
+	'propsGrass/propsGrass_D_long', #8
+	'propsGrass/propsGrass_E_long', #9
+	'propsGrass/propsGrass_F_long', #10
+	'propsGrass/propsGrass_G_long', #11
+	'propsGrass/propsGrass_H_coarse', #12
+	'propsFern/propsFern_A_small', #13
+	'propsFern/propsFern_B_small', #14
+	'propsFern/propsFern_C_small', #15
+	'propsFern/propsFern_D_big', #16
+	'propsFern/propsFern_E_big', #17
+	'propsFern/propsFern_F_big', #18
+	'propsRock/propsRock_A_mossy', #19
+	'propsRock/propsRock_B_granite', #20
+	'propsRock/propsRock_C_sandstone', #21
+	'propsRock/propsRock_D_volcanic', #22
+	'propsRock/propsRock_E_volcanic', #23
+	'propsRock/propsRock_F_sandstone', #24
+	'propsRock/propsRock_G', #25
+	'propsDandelion/propsDandelion_A', #26
+	'propsDandelion/propsDandelion_B', #27
+	'propsDandelion/propsDandelion_C', #28
+	'propsBranch/propsBranch_E_log', #29
 	]
 
 	# Import assets
 	for asset in toImport :
-		resolvePath = propsPath + asset
+		resolvePath = propsPath + asset + '.ma'
 		cmds.file(resolvePath,reference=True,type='mayaAscii',ignoreVersion=True)
 
 
