@@ -58,7 +58,11 @@ def playblastAnim(publish,*args):
 			sys.exit()
 
 	# 2. Set a number of attributes before playblast
-	cmds.refresh(suspend=True) # Pause viewport
+	# Pause viewport
+	cmds.refresh(suspend=True) 
+	# Generate viewport textures
+	mel.eval("generateAllUvTilePreviews;")
+
 	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
 	sceneName = os.path.split(scenePath)
 	shotCam = sceneName[1]
@@ -80,7 +84,12 @@ def playblastAnim(publish,*args):
 	cmds.setAttr("hardwareRenderingGlobals.multiSampleEnable",1)
 	cmds.setAttr('hardwareRenderingGlobals.multiSampleCount',16)
 	cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",0)
-	cmds.setAttr('hardwareRenderingGlobals.motionBlurSampleCount',16)
+	# cmds.setAttr('hardwareRenderingGlobals.motionBlurSampleCount',16)
+	cmds.setAttr('hardwareRenderingGlobals.ssaoEnable',1)
+	cmds.setAttr('hardwareRenderingGlobals.ssaoSamples',32)
+	cmds.setAttr('hardwareRenderingGlobals.ssaoRadius',64)
+	cmds.setAttr('hardwareRenderingGlobals.ssaoFilterRadius',32)
+
 	mel.eval('setObjectDetailsVisibility(0);') # Desactive Object Details
 	mel.eval('setCameraNamesVisibility(1);') # Active Camera Name
 	mel.eval('setCurrentFrameVisibility(1);') # Active Current Frame
@@ -88,8 +97,10 @@ def playblastAnim(publish,*args):
 	# Viewport hide all but geometries
 	viewport = cmds.getPanel(withFocus=True)
 	cmds.modelEditor(viewport,e=1,allObjects=0)
-	cmds.modelEditor(viewport,e=1,pluginObjects=('gpuCacheDisplayFilter',1),polymeshes=1)
-
+	cmds.modelEditor(viewport,e=1, \
+		pluginObjects=('gpuCacheDisplayFilter',1), \
+		polymeshes=1, \
+		displayTextures=1)
 
 	# Do playblast
 	if publish == False :
@@ -121,22 +132,19 @@ def playblastAnim(publish,*args):
 			quality=100, \
 			widthHeight=[2048,858])
 		
-
-
 	# Reset attributes
 	cmds.setAttr(shotCam+'.displayFilmGate',camDFG)
 	cmds.setAttr(shotCam+'.displayResolution',camDR)
 	cmds.setAttr(shotCam+'.displayGateMask',camDGM)
 	cmds.setAttr(shotCam+'.overscan',camOS)
 
+	cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",0)
+	cmds.setAttr('hardwareRenderingGlobals.ssaoEnable',0)
 	cmds.setAttr("hardwareRenderingGlobals.multiSampleEnable",0)
-	cmds.setAttr('hardwareRenderingGlobals.multiSampleCount',8)
-	# cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",0)
-	cmds.setAttr('hardwareRenderingGlobals.motionBlurSampleCount',4)
-	cmds.currentTime('1001')
-	cmds.select(clear=True)
-	# Unpause viewport
+
+	# viewport display all
 	cmds.modelEditor(viewport,e=1,allObjects=1)
+	# Unpause viewport
 	cmds.refresh(suspend=False)
 
 	# Read playblast
