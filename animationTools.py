@@ -90,10 +90,12 @@ def playblastAnim(publish,*args):
 	cmds.setAttr('hardwareRenderingGlobals.ssaoRadius',64)
 	cmds.setAttr('hardwareRenderingGlobals.ssaoFilterRadius',32)
 
-	mel.eval('setObjectDetailsVisibility(0);') # Desactive Object Details
-	mel.eval('setCameraNamesVisibility(1);') # Active Camera Name
-	mel.eval('setCurrentFrameVisibility(1);') # Active Current Frame
-	mel.eval('setFocalLengthVisibility(1);') # Active longueur focale
+	mel.eval('setObjectDetailsVisibility(0);') # Object Details
+	mel.eval('setCameraNamesVisibility(1);') # Camera Name
+	mel.eval('setCurrentFrameVisibility(1);') # Current Frame
+	mel.eval('setFocalLengthVisibility(1);') # Focal length
+	mel.eval('setFrameRateVisibility(0);') # FPS
+
 	# Viewport hide all but geometries
 	viewport = cmds.getPanel(withFocus=True)
 	cmds.modelEditor(viewport,e=1,allObjects=0)
@@ -242,6 +244,7 @@ def toggleConstraintCar(asset,*args):
 			cmds.setAttr(attr,0)
 
 def poseCar(asset,*args):
+	cmds.loadPlugin('atomImportExport.mll')
 	cmds.select(asset+'_rig:CTRL',r=True)
 	cmds.file('//merlin/3d4/skid/04_asset/character/'+asset+'/data/startPose.atom',  \
 		i=True, \
