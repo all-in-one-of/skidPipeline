@@ -39,15 +39,15 @@ def createMenu():
 		c='import lookdevUI; \
 		reload(lookdevUI); \
 		lookdevUI.CreateUI()')
-	# cmds.menuItem(parent = SkidToolsMenu, label = "Previz Tools", \
-	# 	image='SkidMenu_previz.png', \
-	# 	c='import previzUI; \
-	# 	reload(previzUI); \
-	# 	previzUI.CreateUI()')
 
 	# SHOTS
 	cmds.menuItem(divider=True)
 	cmds.menuItem(bld=True,l='SHOTS')
+	cmds.menuItem(parent = SkidToolsMenu, label = "Previz Tools", \
+		image='SkidMenu_previz.png', \
+		c='import previzUI; \
+		reload(previzUI); \
+		previzUI.CreateUI()',en=False)
 	cmds.menuItem(parent = SkidToolsMenu, label = "Animation Tools", \
 		image='SkidMenu_anim.png', \
 		c='import animationUI; \
