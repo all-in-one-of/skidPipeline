@@ -29,11 +29,6 @@ def createMenu():
 	# ASSETS
 	cmds.menuItem(divider=True)
 	cmds.menuItem(bld=True,l='ASSETS')
-	cmds.menuItem(parent = SkidToolsMenu, label = "Animation Tools", \
-		image='SkidMenu_anim.png', \
-		c='import animationUI; \
-		reload(animationUI); \
-		animationUI.CreateUI()')
 	cmds.menuItem(parent = SkidToolsMenu, label = "Assets Tools", \
 		image='SkidMenu_assets.png', \
 		c='import assetsUI; \
@@ -49,12 +44,15 @@ def createMenu():
 	# 	c='import previzUI; \
 	# 	reload(previzUI); \
 	# 	previzUI.CreateUI()')
-	cmds.menuItem(parent = SkidToolsMenu, label = "Rigging Tools", \
-		image='SkidMenu_rig.png', en=False)
 
 	# SHOTS
 	cmds.menuItem(divider=True)
 	cmds.menuItem(bld=True,l='SHOTS')
+	cmds.menuItem(parent = SkidToolsMenu, label = "Animation Tools", \
+		image='SkidMenu_anim.png', \
+		c='import animationUI; \
+		reload(animationUI); \
+		animationUI.CreateUI()')
 	cmds.menuItem(parent=SkidToolsMenu, label="Set Dress Tools", \
 		image='SkidMenu_setDress.png', \
 		c='import setDressUI; \
