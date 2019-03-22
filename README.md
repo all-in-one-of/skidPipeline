@@ -54,8 +54,10 @@ Scripts are separated depending on departments you would normaly have in a studi
 * Auto import lighting rig, list of HDR to choose from
 * Override geometry attributes for render (Subdiv, trace bias, motion samples)
 
-
 ### Common tools
+* Increment and save (with versioning)
+* Compact Renamer from [Erik Lehmann](https://gumroad.com/eriklehmann)
+* Viewport debug
 * Auto import shot camera
 * Set frame range from camera
 * Attach Renderman Subdiv scheme
