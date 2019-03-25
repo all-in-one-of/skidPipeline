@@ -148,39 +148,47 @@ def createInstancer(*args):
 	and create an instancer with index binding'''
 
 	propsPath = '//merlin/3d4/skid/04_asset/props/'
-	''' The following assets must be in the same order that was specified in Houdini
-	First line corresponds to index 0, next line index 1 and so on...'''
+
+	# The following assets must be in the same order that was specified in Houdini
 	toImport = [ \
+	# forest
 	'propsPine/propsPine_A', #0
-	'propsGrass/propsGrass_A_clean', #1
-	'propsGrass/propsGrass_B_clean', #2
-	'propsGrass/propsGrass_C_clean', #3
-	'propsFir/propsFir_A', #4
-	'propsFir/propsFir_B', #5
-	'propsPine/propsPine_B', #6
-	'propsPine/propsPine_C', #7
-	'propsGrass/propsGrass_D_long', #8
-	'propsGrass/propsGrass_E_long', #9
-	'propsGrass/propsGrass_F_long', #10
-	'propsGrass/propsGrass_G_long', #11
-	'propsGrass/propsGrass_H_coarse', #12
-	'propsFern/propsFern_A_small', #13
-	'propsFern/propsFern_B_small', #14
-	'propsFern/propsFern_C_small', #15
-	'propsFern/propsFern_D_big', #16
-	'propsFern/propsFern_E_big', #17
-	'propsFern/propsFern_F_big', #18
-	'propsRock/propsRock_A_mossy', #19
-	'propsRock/propsRock_B_granite', #20
-	'propsRock/propsRock_C_sandstone', #21
-	'propsRock/propsRock_D_volcanic', #22
-	'propsRock/propsRock_E_volcanic', #23
-	'propsRock/propsRock_F_sandstone', #24
-	'propsRock/propsRock_G', #25
-	'propsDandelion/propsDandelion_A', #26
-	'propsDandelion/propsDandelion_B', #27
-	'propsDandelion/propsDandelion_C', #28
-	'propsBranch/propsBranch_E_log', #29
+	'propsPine/propsPine_B', #1
+	'propsPine/propsPine_C', #2
+	'propsFir/propsFir_A', #3
+	'propsFir/propsFir_B', #4
+	# forestGround
+	'propsRock/propsRock_A_mossy', #5
+	'propsRock/propsRock_B_granite', #6
+	'propsRock/propsRock_C_sandstone', #7
+	'propsRock/propsRock_D_volcanic', #8
+	'propsRock/propsRock_E_volcanic', #9
+	'propsRock/propsRock_F_sandstone', #10
+	'propsRock/propsRock_G', #11
+	'propsBranch/propsBranch_A_branch', #12
+	'propsBranch/propsBranch_E_log', #13
+	'propsStump/propsStump_A', #14
+	'propsStump/propsStump_B', #15
+	'propsStump/propsStump_C', #16
+	# grassCut
+	'propsGrass/propsGrass_A_clean', #17
+	'propsGrass/propsGrass_B_clean', #18
+	'propsGrass/propsGrass_C_clean', #19
+	# grassWild
+	'propsGrass/propsGrass_D_long', #20
+	'propsGrass/propsGrass_E_long', #21
+	'propsGrass/propsGrass_F_long', #22
+	'propsGrass/propsGrass_G_long', #23
+	'propsGrass/propsGrass_H_coarse', #24
+	'propsDandelion/propsDandelion_A', #25
+	'propsDandelion/propsDandelion_B', #26
+	'propsDandelion/propsDandelion_C', #27
+	'propsFern/propsFern_A_small', #28
+	'propsFern/propsFern_B_small', #29
+	'propsFern/propsFern_C_small', #30
+	'propsFern/propsFern_D_big', #31
+	'propsFern/propsFern_E_big', #32
+	'propsFern/propsFern_F_big', #33
 	]
 
 	# Import assets
@@ -188,13 +196,6 @@ def createInstancer(*args):
 		resolvePath = propsPath + asset + '.ma'
 		cmds.file(resolvePath,reference=True,type='mayaAscii',ignoreVersion=True)
 
-
-	# toInstance = [ \
-	# 'propsPine_A_rig:propsPine_A_master', \
-	# 'propsGrass_A_clean_rig:propsGrass_A_clean_master', \
-	# 'propsGrass_B_clean_rig:propsGrass_B_clean_master', \
-	# 'propsGrass_C_clean_rig:propsGrass_C_clean_master', \
-	# ]
 	toInstance = []
 	for i in toImport :
 		i = i.split('/')[1]
@@ -228,7 +229,3 @@ def createInstancer(*args):
 		cmds.parent(i,instancedGRP)
 	cmds.parent(instancedGRP,masterGRP)
 	# NE PAS DESACTIVER VISIBILITY
-
-# def exportRIB(*args):
-# select -r FOREST_INSTANCING_GRP ;
-# file -force -options "rmanExportRIBFormat=1;rmanExportMultipleFrames=0;rmanExportStartFrame=1;rmanExportEndFrame=10;rmanExportByFrame=1;rmanExportRIBArchive=1;rmanExportRIBCamera=persp" -typ "RIB" -pr -es "//merlin/3d4/skid/05_shot/seq0080_sh0160/geo/seq0080_sh0160_forest.rib";	
