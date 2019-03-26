@@ -205,11 +205,6 @@ def publishAnimations(*args):
 
 	# fire mayapy
 	publishScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/mayapy/publishAnim.py'
-	# resolvedSelectionSets = ''
-	# for i in selectionSets :
-	# 	resolvedSelectionSets = resolvedSelectionSets + ' ' + i
-	# subprocess.call('mayapy "%s" %s %s%s'%(publishScript,sceneFile,asset,resolvedSelectionSets))
-	# print resolvedSelectionSets
 	subprocess.Popen(['mayapy',publishScript,sceneFile,asset]+selectionSets)
 
 

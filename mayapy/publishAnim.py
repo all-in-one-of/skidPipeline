@@ -86,10 +86,22 @@ else :
 		# replace old publish by our temp file
 		os.rename(tempAbcFile,abcFile)
 		os.system('cls')
+		print('   _____')
+		print('  / ____|')
+		print(' | (___  _   _  ___ ___ ___  ___ ___ ')
+		print('  \\___ \\| | | |/ __/ __/ _ \\/ __/ __|')
+		print('  ____) | |_| | (_| (_|  __/\\__ \\__ \\')
+		print(' |_____/ \\__,_|\\___\\___\\___||___/___/')
+		print('\n')
 		print('// Result : ' + abcFile)
 	except WindowsError, e :
 		# if replacement did not work, show message
 		os.system('cls')
+		print('   \\    /\\')
+		print('    )  ( \')          ARREEEETT')
+		print('   (  /  )')
+		print('    \\(__)|')
+		print('\n')
 		print('// Error : Could not replace published alembic :')
 		print(abcFile)
 		print('File is already open in another application and cant be replaced. Replace manually after close.')
