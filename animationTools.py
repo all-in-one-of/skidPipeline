@@ -163,7 +163,7 @@ def publishAnimations(*args):
 	# Check if save has unsaved changes
 	if cmds.file(q=True,modified=True) :
 		cmds.warning('Save your scene before publishing')
-		ret
+		return
 
 	# Check something is selected
 	if not selectionSets :
@@ -180,8 +180,17 @@ def publishAnimations(*args):
 		cmds.warning('Selection sets from different assets are selected')
 		return
 
-	# Deduce asset
+	# Check if published alembic file is already in use
+	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
+	scenePath = scenePath.replace(os.sep, '/')
 	asset = ns[0].split('_')[0]
+	abcFile = scenePath + '/abc/' + asset + '.abc'
+	if os.path.isfile(abcFile):
+		try :
+			os.rename(abcFile,abcFile)
+		except WindowsError, e :
+			cmds.warning('Published alembic is already open in another application and cant be replaced.')
+			return
 
 	# prepare confirm dialog
 	frameRange = str(cmds.playbackOptions(q=True,ast=True)) + '-' + str(cmds.playbackOptions(q=True,aet=True))

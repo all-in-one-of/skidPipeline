@@ -1,6 +1,6 @@
 '''This will export an animated alembic for the selected geometries using Mayapy'''
 
-import os,sys,shutil
+import os,sys,shutil,ctypes
 import maya.standalone
 import maya.cmds as cmds
 # import maya.mel as mel
@@ -75,9 +75,24 @@ else :
 			os.remove(backupAbcFile)
 		# backup published file
 		print('Backing up previously published animation to ' + backupAbcFile)
-		os.rename(abcFile,backupAbcFile)
+		try :
+			os.rename(abcFile,backupAbcFile)
+		except WindowsError, e :
+			print('Error : Could not backup file')
+			os.system('pause')
 
-	os.rename(tempAbcFile,abcFile)
-	print('// Result : '+abcFile)
-	
+
+	try :
+		# replace old publish by our temp file
+		os.rename(tempAbcFile,abcFile)
+		os.system('cls')
+		print('// Result : ' + abcFile)
+	except WindowsError, e :
+		# if replacement did not work, show message
+		os.system('cls')
+		print('// Error : Could not replace published alembic :')
+		print(abcFile)
+		print('File is already open in another application and cant be replaced. Replace manually after close.')
+		print('// Result : ' + tempAbcFile)
+
 os.system('pause')
