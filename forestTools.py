@@ -48,7 +48,7 @@ def loadHoudiniEngine(*args):
 	else :
 		return True
 
-def loadShotPoints(*args):
+def loadShotPoints(sector,*args):
 	'''This function will load the generated point cloud in Maya via Houdini Engine.
 	It will then copy each point and their attribute to a new point cloud to get rid of Houdini Engine.'''
 
@@ -57,12 +57,10 @@ def loadShotPoints(*args):
 		return
 
 	# Check if point bgeo file exists
-	currentWorkspace = os.path.abspath(cmds.workspace(sn=True,q=True))
-	currentShot = str(os.path.split(currentWorkspace)[1])
-	bgeoPath = '//Merlin/3d4/skid/05_shot/%s/geo/fileCache/%s_instancerPts.bgeo.sc'%(currentShot,currentShot)
-	if not os.path.isfile(bgeoPath):
-		cmds.warning('Point cloud not found for %s'%currentShot)
-		return
+	# currentWorkspace = os.path.abspath(cmds.workspace(sn=True,q=True))
+	# currentShot = str(os.path.split(currentWorkspace)[1])
+	# bgeoPath = '//Merlin/3d4/skid/05_shot/%s/geo/fileCache/%s_instancerPts.bgeo.sc'%(currentShot,currentShot)
+	bgeoPath = '//Merlin/3d4/skid/04_asset/set/setForest/geo/pointCloud_sector%s.bgeo.sc'%sector
 
 	# Set persp far clip plane
 	cmds.setAttr('perspShape.farClipPlane',1000000)
@@ -229,3 +227,25 @@ def createInstancer(*args):
 		cmds.parent(i,instancedGRP)
 	cmds.parent(instancedGRP,masterGRP)
 	# NE PAS DESACTIVER VISIBILITY
+
+def importForest(sector,*args):
+	'''This will import a generated RIB containing the instanced forest'''
+	
+	ribFile = '//Merlin/3d4/skid/04_asset/set/setForest/setForest_sector'+sector+'.rib'
+
+	# 1. Check if exists
+	if not os.path.exists(ribFile) :
+		cmds.warning('Could not find ' + ribFile)
+		return
+
+	importedName = 'setForest_sector'+sector
+
+	if cmds.objExists(importedName) :
+		cmds.delete(importedName)
+	
+	# 2. import
+	mel.eval('file -import -type "RIB"  -ignoreVersion -ra true -mergeNamespacesOnClash false  -pr  -importTimeRange "combine" "%s";'%(ribFile))
+
+	# 3. set render stats
+	cmds.setAttr(importedName+'Shape.visibleInReflections',1)
+	cmds.setAttr(importedName+'Shape.visibleInRefractions',1)
