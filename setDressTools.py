@@ -1,6 +1,7 @@
 # ****************************************** S K I D     S E T D R E S S     T O O L S ******************************************
 
 import maya.cmds as cmds
+import maya.mel as mel
 import os,shutil,datetime
 import commonTools
 
@@ -34,7 +35,6 @@ def allRN():
 			rn.append(n)
 	return rn
 
-
 def unloadSelected():
 	for n in RNfromSelection():
 		cmds.file(referenceNode=n,unloadReference=True)
@@ -53,115 +53,59 @@ def loadAllReferences():
 		print(i)
 		cmds.file(i,force=True,reference=True,loadReferenceDepth='all')
 
-def writeCasting_bkp():
-	'''This will write a file containing all the file path of the reference assets for this shot
-	and their respective namespace'''
-
+def publishSetDress(*args):
 	scenePath = cmds.workspace(sn=True,q=True)
 	scenePath = scenePath.replace(os.sep, '/')
-	sceneName = os.path.split(scenePath)[1]
-	castFile = scenePath+'/data/'+sceneName+'_setDress.cast'
+	shotName = os.path.split(scenePath)[1]
 
-	# 1. Lister toutes les references dans le groupe SETDRESS_GRP
-	setDress  = cmds.listRelatives('SETDRESS_GRP',allDescendents=True)
+	shotDress = scenePath + '/geo/' + shotName + '_setDress.ma'
 
-	rn = []
-	for n in setDress:
-		try :
-			rn.append(cmds.referenceQuery(n,referenceNode=True))
-		except RuntimeError :
-			pass
+	# 1. Check if setDress file already exists
+	if os.path.exists(shotDress) :
+		confirm = cmds.confirmDialog(title='Publish Set Dress', \
+			message='You are about to publish the Set Dress for ' + shotName + '. This will erase the currently published set dress. Please note that there is NO BACKUP. Continue ?', \
+			button=['Continue','Cancel'], \
+			defaultButton='Continue', \
+			cancelButton='Cancel', \
+			dismissString='Cancel' )
+		if confirm != 'Continue':
+			return
 
-	# 3. Merge duplicates
-	rn = list(dict.fromkeys(rn))
-	
-	# 4. Blast sets	and alembic
-	for n in rn:
-		if not ':' in n :
-			rn.remove(n)
+	# 2. Export
+	cmds.file(shotDress, \
+		type='mayaAscii', \
+		exportSelected=True, \
+		force=True, \
+		preserveReferences=False)
 
-
-
-	# 5. Keep only rig level references
-	for n in rn:
-		if not n.endswith('rigRN') :
-			rn.remove(n)
-
-
-	# print(rn)
-
-	# 9. if .cast file already exists : backup and delete
-	ts = datetime.datetime.now()
-	ts = '%s%s%s_%s%s%s'%(ts.year,ts.month,ts.day,ts.hour,ts.minute,ts.second)
-	backupFile = scenePath+'/data/backup/'+sceneName+'_'+ts+'.cast'	
-	
-	if os.path.isfile(castFile):
-		shutil.copyfile(castFile,backupFile)
-		os.remove(castFile)
-
-	# # 10. cast file authoring
-	with open(castFile,'w') as f:
-		for i in rn :
-			namespace = str(i)
-			path = cmds.referenceQuery(i,filename=True,withoutCopyNumber=True)
-			f.write("%s %s\n" %(path,namespace))
-		f.close()
-
-	# 11. Inview message
-	print('\n// Result: '+castFile+' //')
+	# 3. inview message
+	print('// Result : ' + shotDress)
 	cmds.inViewMessage( \
-		amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'_setDress.cast</hl>', \
+		amg='Set Dress has been publish to <hl>' + shotDress + '</hl>', \
 		pos='midCenter', \
 		fade=True)
 
-def writeCasting():
-	'''This will write a file containing all the file path of the reference assets for this shot
-	and their respective namespace'''
-
-	scenePath = cmds.workspace(sn=True,q=True)
-	scenePath = scenePath.replace(os.sep, '/')
-	sceneName = os.path.split(scenePath)[1]
-	castFile = scenePath+'/data/'+sceneName+'_setDress.cast'
-
-	# 1. Lister le contenu de SETDRESS_GRP
-	setDress  = cmds.listRelatives('SETDRESS_GRP',children=True)
-
-	# 2. Fetch topmost reference nodes
-	refNodes = []
-	for n in setDress:
-		try :
-			refNodes.append(cmds.referenceQuery(n,referenceNode=True))
-		except RuntimeError :
-			pass
-
-	# 3. If reference node is a set, fetch children and blast set
-	setsRN = [n for n in refNodes if n.startswith('set') and not n.startswith('setGleiten')]
-	for n in setsRN :
-		children = cmds.referenceQuery(n,referenceNode=True,child=True)
-		for child in children :
-			refNodes.append(child)
-		refNodes.remove(n)
-
-	# 9. if .cast file already exists : backup and delete
-	ts = datetime.datetime.now()
-	ts = '%s%s%s_%s%s%s'%(ts.year,ts.month,ts.day,ts.hour,ts.minute,ts.second)
-	backupFile = scenePath+'/data/backup/'+sceneName+'_'+ts+'.cast'	
+def importSector(sector,*args):
+	'''This will import the specified sector'''
 	
-	if os.path.isfile(castFile):
-		shutil.copyfile(castFile,backupFile)
-		os.remove(castFile)
+	# 1. create namespace
+	ns = 'setSector' + sector
 
-	# # 10. cast file authoring
-	with open(castFile,'w') as f:
-		for i in refNodes :
-			namespace = str(i)
-			path = cmds.referenceQuery(i,filename=True,withoutCopyNumber=True)
-			f.write("%s %s\n" %(path,namespace))
-		f.close()
+	# 2. Check if file exists 
+	sector = '//Merlin/3d4/skid/04_asset/set/setSector' + sector + '/setSector' + sector + '.ma'
+	if not os.path.exists(sector) :
+		cmds.warning('Could not find ' + sector)
+		return
 
-	# 11. Inview message
-	print('\n// Result: '+castFile+' //')
-	cmds.inViewMessage( \
-		amg='Casting has bee written to <hl>'+sceneName+'/data/'+sceneName+'_setDress.cast</hl>', \
-		pos='midCenter', \
-		fade=True)
+	# 3. Check if imported
+	importedName = ns + ':' + ns + '_grp'
+	if cmds.objExists(importedName) :
+		cmds.warning(importedName + ' is already imported.')
+		return
+
+	cmds.file(sector, \
+		r=True, \
+		type='mayaAscii', \
+		ignoreVersion=True, \
+		gl=True, \
+		ns=ns)
