@@ -199,7 +199,10 @@ def publishAnimations(*args):
 	# confirm dialog
 	confirm = cmds.confirmDialog( title='Publish Animation', \
 		message='This will replace any previously published animation. Check your parameters : \n\nSCENE FILE :\n %s \n\nASSET : \n%s \n\nSELECTION SETS : \n%s \n\nFRAME RANGE : \n%s' %(sceneFile,asset,selectionSets,frameRange), \
-		button=['Continue','Cancel'], defaultButton='Continue', cancelButton='Cancel', dismissString='Cancel' )
+		button=['Continue','Cancel'], \
+		defaultButton='Continue', \
+		cancelButton='Cancel', \
+		dismissString='Cancel' )
 	if confirm != 'Continue':
 		return
 
