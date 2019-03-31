@@ -216,30 +216,30 @@ def assignShaders(*args):
 		cmds.warning('Could not find any object with ID')
 
 
-def importForest(*args):
-	'''This will import a generated RIB containing the instanced forest'''
+def importSetDress(*args):
+	'''This will import the scene set dress'''
 	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
 	scenePath = scenePath.replace(os.sep, '/')
 	shotName = os.path.split(scenePath)[1]
 
-	ribFile = scenePath + '/geo/' + shotName + '_forest.rib'
+	shotDress = scenePath + '/geo/' + shotName + '_setDress.ma'
 
-	# 1. Check if exists
-	if not os.path.exists(ribFile) :
-		cmds.warning('Could not find ' + ribFile)
+	# 1. Check if file exists and if imported
+	if not os.path.exists(shotDress) :
+		cmds.warning('Could not find ' + shotDress)
 		return
-	if cmds.objExists('FOREST_GRP') :
-		cmds.delete('FOREST_GRP')
+
+	if cmds.objExists('SETDRESS_GRP') :
+		cmds.warning('SETDRESS_GRP already exists, please delete and retry')
+		return
 	
-	# 2. import and group
-	mel.eval('file -import -type "RIB"  -ignoreVersion -ra true -mergeNamespacesOnClash false -namespace "%s_forest"  -pr  -importTimeRange "combine" "%s";'%(shotName,ribFile))
-	cmds.group(shotName+'_forest',n='FOREST_GRP')
-
-	# 3. set render stats
-	cmds.setAttr(shotName+'_forestShape.visibleInReflections',1)
-	cmds.setAttr(shotName+'_forestShape.visibleInRefractions',1)
-
-		
+	# 2. import
+	cmds.file(shotDress, \
+		r=True, \
+		type='mayaAscii', \
+		ignoreVersion=True, \
+		gl=True, \
+		dns=True)
 
 def importLightRig(*args) :
 	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
