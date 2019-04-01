@@ -154,7 +154,7 @@ def playblastAnim(publish,*args):
 		os.startfile(playblastPath)
 
 def publishAnimations(*args):
-	'''This will publish the current working rig with selected sets in maya 
+	'''This will publish the selected sets using maya 
 	standalone and automatically backup any previously published animation'''
 	import subprocess
 
@@ -260,3 +260,56 @@ def poseCar(asset,*args):
 		namespace='poseCar', \
 		options=';;targetTime=3;option=scaleReplace;match=hierarchy;;selected=selectedOnly;search=;replace=;prefix=;suffix=;mapFile=;')
 	cmds.select(asset+'_rig:CTRL',r=True)
+
+def publishCamera(*args):
+	from shutil import copyfile
+
+	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
+	sceneName = os.path.split(scenePath)
+	shotCam = sceneName[1]
+
+	if not cmds.objExists(shotCam):
+		cmds.warning('No camera matches name '+shotCam)
+		return
+
+	abcFile = scenePath+'/abc/'+shotCam+'.abc'
+	frameRange = str(cmds.playbackOptions(q=True,ast=True)) + ' ' + str(cmds.playbackOptions(q=True,aet=True))
+
+	if os.path.exists(abcFile):
+		confirm = cmds.confirmDialog( title='Publish Camera', \
+		message='This will replace any previously published camera. Check your parameters : \n\nSHOT NAME :\n%s\n\nFRAME RANGE : \n%s' %(shotCam,frameRange), \
+		button=['Continue','Cancel'], \
+		defaultButton='Continue', \
+		cancelButton='Cancel', \
+		dismissString='Cancel' )
+		if confirm != 'Continue':
+			return
+
+	# backup
+	backupPath = scenePath + '/abc/backup'
+	backupAbcFile = backupPath + shotCam + '.abc'
+	if not os.path.exists(backupPath):
+		os.makedirs(backupPath)
+	try :
+		copyfile(abcFile,backupAbcFile)
+	except WindowsError, e :
+		cmds.warning('Error : Could not backup file ' + backupAbcFile)
+		return
+
+	cmds.select(shotCam,r=True)
+	root = cmds.ls(selection=True,l=True)[0]
+	print(root)
+
+	# Pause viewport
+	cmds.refresh(suspend=True) 
+
+	# Load plugin
+	cmds.loadPlugin( 'AbcExport.mll' )
+
+	# Export
+	resolvedCmd = '-frameRange %s -step 1 -stripNamespaces -worldSpace -writeVisibility -eulerFilter -dataFormat ogawa -root %s -file %s' \
+	 %(frameRange,root,abcFile)
+	cmds.AbcExport (j=resolvedCmd)
+
+	# Unpause viewport
+	cmds.refresh(suspend=False)

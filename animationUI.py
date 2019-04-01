@@ -118,15 +118,19 @@ def CreateUI(*args):
 				# 			c='import animationTools; \
 				# 			reload(animationTools); \
 				# 			animationTools.exportAbcRfM()')
-						button(l='Publish Animation', \
-						c='import animationTools; \
-						reload(animationTools); \
-						animationTools.publishAnimations()')
+					button(l='Publish Camera', \
+					c='import animationTools; \
+					reload(animationTools); \
+					animationTools.publishCamera()')
+					button(l='Publish Animation', \
+					c='import animationTools; \
+					reload(animationTools); \
+					animationTools.publishAnimations()')
 
 				with frameLayout('Nomenclatures'):
-						button(l='Afficher nomenclatures',h=30, \
-							c='import commonTools; \
-							reload(commonTools); \
-							commonTools.showNomenclatures()')
+					button(l='Afficher nomenclatures',h=30, \
+						c='import commonTools; \
+						reload(commonTools); \
+						commonTools.showNomenclatures()')
 
 CreateUI()

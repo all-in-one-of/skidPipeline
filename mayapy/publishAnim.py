@@ -50,7 +50,7 @@ cmds.evaluationManager(mode="off")
 
 # 5. export alembic
 print('\nExporting alembic...\n')
-resolvedCmd = '-frameRange %s -stripNamespaces -uvWrite -worldSpace -writeVisibility -eulerFilter -dataFormat ogawa%s -file %s' \
+resolvedCmd = '-frameRange %s -step 0.05 -stripNamespaces -uvWrite -worldSpace -writeVisibility -eulerFilter -dataFormat ogawa%s -file %s' \
  %(frameRange,root,tempAbcFile)
 cmds.AbcExport (j=resolvedCmd)
 
