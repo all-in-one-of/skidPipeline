@@ -60,7 +60,12 @@ def publishSetDress(*args):
 
 	shotDress = scenePath + '/geo/' + shotName + '_setDress.ma'
 
-	# 1. Check if setDress file already exists
+	# 1. Check if setdress group exists :
+	if not cmds.objExists('SETDRESS_GRP'):
+		cmds.warning('SETDRESS_GRP does not exist.')
+		return
+
+	# 2. Check if setDress file already exists
 	if os.path.exists(shotDress) :
 		confirm = cmds.confirmDialog(title='Publish Set Dress', \
 			message='You are about to publish the Set Dress for ' + shotName + '. This will erase the currently published set dress. Please note that there is NO BACKUP. Continue ?', \
@@ -72,6 +77,8 @@ def publishSetDress(*args):
 			return
 
 	# 2. Export
+	cmds.select('SETDRESS_GRP',r=True)
+
 	cmds.file(shotDress, \
 		type='mayaAscii', \
 		exportSelected=True, \
