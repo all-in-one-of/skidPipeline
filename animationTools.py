@@ -83,7 +83,7 @@ def playblastAnim(publish,*args):
 	cmds.setAttr(shotCam+'.overscan',1)
 	cmds.setAttr("hardwareRenderingGlobals.multiSampleEnable",1)
 	cmds.setAttr('hardwareRenderingGlobals.multiSampleCount',16)
-	cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",0)
+	# cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",1)
 	# cmds.setAttr('hardwareRenderingGlobals.motionBlurSampleCount',16)
 	cmds.setAttr('hardwareRenderingGlobals.ssaoEnable',1)
 	cmds.setAttr('hardwareRenderingGlobals.ssaoSamples',32)
@@ -140,12 +140,15 @@ def playblastAnim(publish,*args):
 	cmds.setAttr(shotCam+'.displayGateMask',camDGM)
 	cmds.setAttr(shotCam+'.overscan',camOS)
 
-	cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",0)
+	# cmds.setAttr("hardwareRenderingGlobals.motionBlurEnable",0)
 	cmds.setAttr('hardwareRenderingGlobals.ssaoEnable',0)
 	cmds.setAttr("hardwareRenderingGlobals.multiSampleEnable",0)
 
-	# viewport display all
-	cmds.modelEditor(viewport,e=1,allObjects=1)
+	# viewport display all, disable textures
+	cmds.modelEditor(viewport, \
+		e=1, \
+		allObjects=1, \
+		displayTextures=0)
 	# Unpause viewport
 	cmds.refresh(suspend=False)
 
@@ -210,32 +213,6 @@ def publishAnimations(*args):
 	publishScript = '//Merlin/3d4/skid/09_dev/toolScripts/publish/mayapy/publishAnim.py'
 	subprocess.Popen(['mayapy',publishScript,sceneFile,asset]+selectionSets)
 
-
-
-def constraintCar(asset,*args):
-	constraints = ['FR','FL','RR','RL']
-	attrList = [ \
-	asset+'_rig:CTRL_roue_RR_offset_parentConstraint1.Fit_to_ground_RRW0', \
-	asset+'_rig:CTRL_roue_RL_offset_parentConstraint1.Fit_to_ground_RLW0', \
-	asset+'_rig:CTRL_roue_FL_offset_parentConstraint1.Fit_to_ground_FLW0', \
-	asset+'_rig:CTRL_roue_FR_offset_parentConstraint1.Fit_to_ground_FRW0' ]
-	sel = cmds.ls(selection=True)
-
-	if len(sel) != 1:
-		cmds.warning('More than one object is selected')
-		return
-
-	sel = cmds.listRelatives(sel,shapes=True)
-	
-	for attr in attrList :
-		cmds.setAttr(attr,1)
-
-	for const in constraints :
-		cmds.select(asset + '_rig:Fit_to_ground_'+const+'_offset',add=True)
-		cmds.geometryConstraint(weight=1)
-		cmds.select(asset + '_rig:Fit_to_ground_'+const+'_offset',tgl=True)
-
-	cmds.setAttr(sel[0]+'.visibility',0)
 
 def toggleConstraintCar(asset,*args):
 	attrList = [ \
@@ -313,3 +290,55 @@ def publishCamera(*args):
 
 	# Unpause viewport
 	cmds.refresh(suspend=False)
+
+def contraintCharacterToCar(asset,*args):
+	print(asset)
+	# propsBrevell
+	if asset == 'propsBrevell' or asset == 'characterEthan' or asset == 'propsEthanHelmet' :
+		# constraint character to car
+		toConstraint = ['characterEthan_rig:C_ROOT_CTRL','characterEthan_rig:L_LEG_bonus_CTRL','characterEthan_rig:R_LEG_bonus_CTRL','characterEthan_rig:L_ARM_CTRL','characterEthan_rig:R_ARM_CTRL']
+		for i in toConstraint :
+			# check if objects are imported
+			if cmds.objExists(i) :
+				# delete existing constraints
+				constr = i.split(':')[1]+'_parentConstraint1'
+				if cmds.objExists(constr):
+					cmds.delete(constr)
+				# create new constraints
+				cmds.parentConstraint('propsBrevell_rig:CTRL_chassis',i,w=1,mo=True)
+		# contraint helmet to neck
+		if cmds.objExists('propsEthanHelmet_rig:CTRL_mainElmet'):
+			cmds.parentConstraint('characterEthan_rig:C_NECK_CTRL','propsEthanHelmet_rig:CTRL_mainElmet',w=1,mo=True)
+
+	# propsWerner
+	elif asset == 'propsWerner' or asset == 'characterAlton' or asset == 'propsAltonHelmet':
+		# constraint character to car
+		toConstraint = ['characterAlton_rig:C_ROOT_CTRL','characterAlton_rig:R_LEG_bonus_CTRL','characterAlton_rig:L_LEG_bonus_CTRL','characterAlton_rig:R_ARM_CTRL','characterAlton_rig:L_ARM_CTRL']
+		for i in toConstraint :
+			# check if objects are imported
+			if cmds.objExists(i) :
+				# delete existing constraints
+				constr = i.split(':')[1]+'_parentConstraint1'
+				if cmds.objExists(constr):
+					cmds.delete(constr)
+				# create new constraints
+				cmds.parentConstraint('propsWerner_rig:CTRL_chassis',i,w=1,mo=True)
+		# contraint helmet to neck
+		if cmds.objExists('propsAltonHelmet_rig:CTRL_mainElmet'):
+			cmds.parentConstraint('characterAlton_rig:C_NECK_CTRL','propsAltonHelmet_rig:CTRL_mainElmet',w=1,mo=True)	
+
+	# End
+	else :
+		cmds.warning(asset+' isnt supported')
+		return
+
+def constraintCharacterToSteeringWheel(asset,*args):
+	# propsBrevell
+	if asset == 'propsBrevell':
+		toConstraint = ['characterEthan_rig:L_ARM_CTRL','characterEthan_rig:R_ARM_CTRL']
+		for i in toConstraint :
+			# delete previous constraint
+			constr = i.split(':')[1]+'_parentConstraint1'
+			if cmds.objExists(constr):
+				cmds.delete(constr)
+			# create new constraint

@@ -9,7 +9,7 @@ from pymel.core import *
 # ****************************************** G L O B A L S ******************************************
 
 animScriptsPath = '//Merlin/3d4/skid/09_dev/toolScripts/publish/animScripts'
-riggedAssets = ['propsBrevell','characterEthan','propsEthanHelmet','propsWerner','propsAltonHelmet']
+riggedAssets = ['propsBrevell','characterEthan','propsEthanHelmet','propsWerner','characterAlton','propsAltonHelmet']
 chosenRig = 'propsBrevell'
 animationWindow = "animationWindow"
 
@@ -24,10 +24,10 @@ def callImportRig(*args):
 	reload(commonTools)
 	commonTools.importAssetMa(chosenRig)
 
-def callConstraintCar(*args):
+def callContraintCharacterToCar(*args):
 	import animationTools
 	reload(animationTools)
-	animationTools.constraintCar(chosenRig)
+	animationTools.contraintCharacterToCar(chosenRig)
 
 def callToggleConstraintCar(*args):
 	import animationTools
@@ -87,19 +87,22 @@ def CreateUI(*args):
 					with columnLayout():
 						button(l='Import asset',c=callImportRig)
 
-				with frameLayout('Character Tools'):
-					with columnLayout():
-						button(l='Start pose !',c=callPoseCar)
+				# with frameLayout('Character Tools'):
+				# 	with columnLayout():
+				# 		button(l='Start pose !',c=callPoseCar)
 
 				with frameLayout('Car Tools'):
 					with columnLayout():
-						button(l='Constraint car to selected',c=callConstraintCar)
+						button(l='Constraint character to car',c=callContraintCharacterToCar)
 						button(l='Toggle constraint',c=callToggleConstraintCar)
 
 						# button(l='Create Speed Attribute', \
 						# 	c='import animationTools; \
 						# 	reload(animationTools); \
 						# 	animationTools.createSpeedAttribute()')
+						button(l='Offset selected', \
+							c='import maya.mel as mel; \
+							mel.eval(\'source "%s/offset_node_multiple.mel"\')'%animScriptsPath)
 
 				with frameLayout('Playblast'):
 					with columnLayout():
@@ -107,25 +110,26 @@ def CreateUI(*args):
 							c='import animationTools; \
 							reload(animationTools); \
 							animationTools.playblastAnim(False)')
-						button(l='Publish Playblast', \
-							c='import animationTools; \
-							reload(animationTools); \
-							animationTools.playblastAnim(True)')
+						
 			
-				with frameLayout('Export'):
-				# 	with columnLayout():
+				with frameLayout('Publish'):
+					with columnLayout():
 				# 		button(l='Export Selected', \
 				# 			c='import animationTools; \
 				# 			reload(animationTools); \
 				# 			animationTools.exportAbcRfM()')
-					button(l='Publish Camera', \
-					c='import animationTools; \
-					reload(animationTools); \
-					animationTools.publishCamera()')
-					button(l='Publish Animation', \
-					c='import animationTools; \
-					reload(animationTools); \
-					animationTools.publishAnimations()')
+						button(l='Publish Playblast', \
+							c='import animationTools; \
+							reload(animationTools); \
+							animationTools.playblastAnim(True)')
+						button(l='Publish Camera', \
+							c='import animationTools; \
+							reload(animationTools); \
+							animationTools.publishCamera()')
+						button(l='Publish Animation', \
+							c='import animationTools; \
+							reload(animationTools); \
+							animationTools.publishAnimations()')
 
 				with frameLayout('Nomenclatures'):
 					button(l='Afficher nomenclatures',h=30, \
