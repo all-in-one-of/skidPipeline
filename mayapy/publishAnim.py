@@ -48,11 +48,17 @@ for i in cmds.ls(selection=True,l=True):
 # 4. Switch to DG
 cmds.evaluationManager(mode="off")
 
+# set export substep depending on asset
+if asset == 'propsBrevell' or if asset == 'propsWerner' or if 'propsOpponentsCar' :
+	step = '0.05'
+else :
+	step = '0.5'
+
 # 5. export alembic
 print('\nExporting alembic...\n')
-resolvedCmd = '-frameRange %s -step 0.05 -stripNamespaces -uvWrite -worldSpace -writeVisibility -eulerFilter -dataFormat ogawa%s -file %s' \
- %(frameRange,root,tempAbcFile)
-cmds.AbcExport (j=resolvedCmd)
+resolvedCmd = '-frameRange %s -step %s -stripNamespaces -uvWrite -worldSpace -writeVisibility -eulerFilter -dataFormat ogawa%s -file %s' \
+ %(frameRange,step,root,tempAbcFile)
+cmds.AbcExport(j=resolvedCmd)
 
 # 6. Exit maya
 cmds.quit(abort=True)
