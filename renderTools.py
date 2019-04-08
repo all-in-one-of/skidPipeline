@@ -134,8 +134,7 @@ def importShotAlembics(*args):
 				resolvePath = os.path.join(abcPath,i+'.abc')
 				resolvePath = os.path.abspath(resolvePath)
 				# print resolvePath
-				cmds.file(resolvePath,r=True,type='Alembic',ignoreVersion=True,gl=True,ns=i)
-			
+				cmds.file(resolvePath,r=True,type='Alembic',ignoreVersion=True,gl=True,ns=i)	
 
 def importShaders(*args):
 	'''This will import the corresponding shaders for the imported animations'''
