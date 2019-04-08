@@ -128,7 +128,12 @@ def importAssetMa(asset,*args):
 		return
 	
 	resolvePath = os.path.join(assetPath,assetType,asset,asset+'_rig.ma')
-	cmds.file(resolvePath,r=True,type='mayaAscii',ignoreVersion=True,gl=True,ns=asset+'_rig')
+	cmds.file(resolvePath, \
+		r=True, \
+		type='mayaAscii', \
+		ignoreVersion=True, \
+		gl=True, \
+		ns=asset+'_rig')
 
 def loadRenderSettings(context,*args): # Argument must be json file name
 	import maya.app.renderSetup.views.renderSetupPreferences as prefs
