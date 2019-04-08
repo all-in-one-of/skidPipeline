@@ -95,17 +95,17 @@ def CreateUI(*args):
 							reload(forestTools); \
 							forestTools.createInstancer()')
 
-				with frameLayout('Forest rib archive import'):
-					with rowColumnLayout():
-						ribs = glob.glob(forestDir + r'setForest_sector?.rib')
-						for rib in ribs:
-							sector = rib.split('_sector')[1]
-							sector = sector.split('.')[0]
+				# with frameLayout('Forest rib archive import'):
+				# 	with rowColumnLayout():
+				# 		ribs = glob.glob(forestDir + r'setForest_sector?.rib')
+				# 		for rib in ribs:
+				# 			sector = rib.split('_sector')[1]
+				# 			sector = sector.split('.')[0]
 							# print sector
-							button(l='Import forest sector %s'%sector, \
-								h=25, \
-								c='import forestTools; \
-								reload(forestTools); \
-								forestTools.importForest("%s")'%sector)
+							# button(l='Import forest sector %s'%sector, \
+							# 	h=25, \
+							# 	c='import forestTools; \
+							# 	reload(forestTools); \
+							# 	forestTools.importForest("%s")'%sector)
 
 CreateUI()
