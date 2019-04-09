@@ -291,6 +291,13 @@ def publishCamera(*args):
 	# Unpause viewport
 	cmds.refresh(suspend=False)
 
+	#Inview message if successful
+	if not os.path.exists(abcFile):
+		cmds.warning('Camera publish failed, check with Val')
+		return
+
+	cmds.inViewMessage(amg='Camera publish successful',pos='midCenter',fade=True)
+
 def contraintCharacterToCar(asset,*args):
 	print(asset)
 	# propsBrevell
