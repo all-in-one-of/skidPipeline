@@ -49,10 +49,10 @@ for i in cmds.ls(selection=True,l=True):
 cmds.evaluationManager(mode="off")
 
 # set export substep depending on asset
-if asset == 'propsBrevell' or if asset == 'propsWerner' or if 'propsOpponentsCar' :
+if asset == 'propsBrevell' or asset == 'propsWerner' or asset == 'propsOpponentsCar' :
 	step = '0.05'
 else :
-	step = '0.5'
+	step = '1'
 
 # 5. export alembic
 print('\nExporting alembic...\n')
