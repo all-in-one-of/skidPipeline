@@ -15,11 +15,26 @@ shotPath = os.path.abspath('//Merlin/3d4/skid/05_shot')
 
 def versionUp(*args):
 	# break full name with path on peaces: path, name, ext
+
+	# DEBUG TEMP ________________________________________________
+
 	fullName = cmds.file(q=1,sn=1,shn=1)
+	print(fullName)
+
 	fullNamePath = cmds.file(q=1,sn=1)
+	print(fullNamePath)
+
 	absName = os.path.dirname(fullNamePath)
+	print(absName)
+
 	noExtName = fullName.split('.')[0]
+	print(noExtName)
+
 	ext = fullName.split('.')[1]
+	print(ext)
+
+	# DEBUG TEMP ________________________________________________
+
 	splitName = noExtName.split('_v')
 	# increase version
 	verIndex = len(splitName) - 1
