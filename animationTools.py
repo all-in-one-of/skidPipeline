@@ -102,7 +102,8 @@ def playblastAnim(publish,*args):
 	cmds.modelEditor(viewport,e=1, \
 		pluginObjects=('gpuCacheDisplayFilter',1), \
 		polymeshes=1, \
-		displayTextures=1)
+		displayTextures=1, \
+		imagePlane=1)
 
 	# Do playblast
 	if publish == False :
