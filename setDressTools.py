@@ -58,15 +58,15 @@ def publishSetDress(*args):
 	scenePath = scenePath.replace(os.sep, '/')
 	shotName = os.path.split(scenePath)[1]
 
-	shotDress = scenePath + '/geo/' + shotName + '_setDress.ma'
+	maPublish = scenePath + '/geo/' + shotName + '_setDress.ma'
 
 	# 1. Check if setdress group exists :
-	if not cmds.objExists('SETDRESS_GRP'):
-		cmds.warning('SETDRESS_GRP does not exist.')
+	if not cmds.objExists('setDress_grp'):
+		cmds.warning('setDress_grp does not exist.')
 		return
 
 	# 2. Check if setDress file already exists
-	if os.path.exists(shotDress) :
+	if os.path.exists(maPublish) :
 		confirm = cmds.confirmDialog(title='Publish Set Dress', \
 			message='You are about to publish the Set Dress for ' + shotName + '. This will erase the currently published set dress. Please note that there is NO BACKUP. Continue ?', \
 			button=['Continue','Cancel'], \
@@ -77,18 +77,53 @@ def publishSetDress(*args):
 			return
 
 	# 2. Export
-	cmds.select('SETDRESS_GRP',r=True)
+	sel = cmds.select('setDress_grp',r=True)
 
-	cmds.file(shotDress, \
+	# a. mayaAscii publish
+	cmds.file(maPublish, \
 		type='mayaAscii', \
 		exportSelected=True, \
 		force=True, \
 		preserveReferences=False)
 
-	# 3. inview message
-	print('// Result : ' + shotDress)
+	# 4. inview message
+	print('// Result : ' + maPublish)
 	cmds.inViewMessage( \
-		amg='Set Dress has been publish to <hl>' + shotDress + '</hl>', \
+		amg='Set Dress publish successful', \
+		pos='midCenter', \
+		fade=True)
+
+def publishSetDressGPU(*args):
+	scenePath = cmds.workspace(sn=True,q=True)
+	scenePath = scenePath.replace(os.sep, '/')
+
+	abcPublishPath = scenePath + '/abc'
+	abcPublishFile = 'setDressGPU'
+
+	# 1. Check if setdress group exists :
+	if not cmds.objExists('setDress_grp'):
+		cmds.warning('setDress_grp does not exist.')
+		return
+
+	# 2. Export
+	sel = cmds.select('setDress_grp',r=True)
+
+	# alembic publish
+	cmds.gpuCache('setDress_grp', \
+		startTime=1, \
+		endTime=1, \
+		optimize=True, \
+		optimizationThreshold=100, \
+		writeMaterials=False, \
+		dataFormat='ogawa', \
+		useBaseTessellation=True, \
+		directory=abcPublishPath, \
+		fileName=abcPublishFile)
+
+	# 4. inview message
+	print('// Result : ' + abcPublishPath + abcPublishFile)
+	cmds.inViewMessage( \
+		amg='Set Dress GPU publish successful', \
 		pos='midCenter', \
 		fade=True)
 
@@ -115,4 +150,18 @@ def importSector(sector,*args):
 		type='mayaAscii', \
 		ignoreVersion=True, \
 		gl=True, \
-		ns=ns)
+		ns=ns, \
+		loadReferenceDepth='all')
+
+def importAssetMa(asset,*args):
+	if asset == 'propsGround' :
+		assetPath = '//Merlin/3d4/skid/04_asset/set/setGleitenstrasse/%s.ma'%asset
+	else :
+		assetPath = '//Merlin/3d4/skid/04_asset/props/%s/%s.ma'%(asset,asset)
+	
+	cmds.file(assetPath, \
+		r=True, \
+		type='mayaAscii', \
+		ignoreVersion=True, \
+		gl=True, \
+		ns=asset)
