@@ -14,9 +14,9 @@ def CreateUI(*args):
 	from rfm2.config import cfg
 	rmanversion = cfg().rfm_env['versions']['rfm']
 	print rmanversion
-	if rmanversion != "22.3" :
+	if rmanversion != "22.4" :
 		commonTools.areeeeett()
-		cmds.evalDeferred("cmds.warning('Wrong Renderman for Maya version (installed version is %s), should be 22.3')" % rmanversion)
+		cmds.evalDeferred("cmds.warning('Wrong Renderman for Maya version (installed version is %s), should be 22.4')" % rmanversion)
 		return
 	
 	# define template UI
@@ -46,24 +46,35 @@ def CreateUI(*args):
 							c='import previzTools;  \
 							reload(previzTools); \
 							previzTools.setShot()')
-						button(l='Import Alembic as Reference', \
-							c='import previzTools; \
-							reload(previzTools); \
-							previzTools.referenceAlembic()')
+						# button(l='Import Alembic as Reference', \
+						# 	c='import previzTools; \
+						# 	reload(previzTools); \
+						# 	previzTools.referenceAlembic()')
 
 
 				with frameLayout('References'):
 					with columnLayout():
-						button(l='Load all references from selection',\
-							c='import setDressTools; \
-							reload(setDressTools); \
-							setDressTools.loadAllReferences()',en=False)
+						# button(l='Load all references from selection',\
+						# 	c='import setDressTools; \
+						# 	reload(setDressTools); \
+						# 	setDressTools.loadAllReferences()',en=False)
 						button(l='Unload references from selection',\
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.unloadSelected()')
 						button(l='Backup transforms to Atom file',\
 							c='mel.eval("performExportAnim 1;")')
+
+				with frameLayout('Quick reference'):
+					with columnLayout():
+						# button(l='Reference propsGround', \
+						# 	c='import setDressTools; \
+						# 	reload(setDressTools); \
+						# 	setDressTools.importAssetMa("propsGround")')
+						button(l='Reference propsRacetrack', \
+							c='import setDressTools; \
+							reload(setDressTools); \
+							setDressTools.importAssetMa("propsRaceTrack")')
 
 				with frameLayout('Sectors'):
 					with columnLayout():
@@ -80,6 +91,10 @@ def CreateUI(*args):
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.publishSetDress()')
+						button(l='Publish Set Dress GPU', \
+							c='import setDressTools; \
+							reload(setDressTools); \
+							setDressTools.publishSetDressGPU()')
 				
 				with frameLayout('Nomenclatures'):
 					button(l='Afficher nomenclatures', \
