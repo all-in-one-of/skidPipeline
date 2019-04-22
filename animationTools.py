@@ -188,6 +188,11 @@ def publishAnimations(*args):
 	scenePath = os.path.abspath(cmds.workspace(sn=True,q=True))
 	scenePath = scenePath.replace(os.sep, '/')
 	asset = ns[0].split('_')[0]
+	
+	# override namespace if asset is propsOpponentsCar
+	if asset == 'propsOpponentsCar':
+		asset = ns[0].split('_')[0] + ns[0].split('_rig')[1]
+
 	abcFile = scenePath + '/abc/' + asset + '.abc'
 	if os.path.isfile(abcFile):
 		try :

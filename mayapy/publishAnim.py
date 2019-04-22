@@ -49,7 +49,11 @@ for i in cmds.ls(selection=True,l=True):
 cmds.evaluationManager(mode="off")
 
 # set export substep depending on asset
-if asset == 'propsBrevell' or asset == 'propsWerner' or asset == 'propsOpponentsCar' :
+cars = ['propsBrevell','propsWerner']
+for i in range(0,20):
+	cars.append('propsOpponentsCar'+str(i))
+
+if asset in cars :
 	step = '0.05'
 else :
 	step = '1'
