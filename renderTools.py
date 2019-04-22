@@ -7,6 +7,8 @@ import commonTools,os
 # ****************************************** G L O B A L S ******************************************
 
 deltaAbc = ['propsBrevell','propsWerner','propsEthanHelmet','propsAltonHelmet','characterEthan']
+for i in range(0,20):
+	deltaAbc.append('propsOpponentsCar'+str(i))
 
 # ****************************************** F U N C T I O N S ******************************************
 
@@ -120,24 +122,55 @@ def importShotAlembics(*args):
 			else :
 				toImport.append(i)
 
+	# stop if nothing to import
 	if not toImport :
-		cmds.warning('No more animation to import')
-	else :
-		confirm = cmds.confirmDialog(title='Import Shot animations', \
-			message='Found '+str(len(toImport))+' animation files to import. Continue ?', \
-			button=['Continue','Cancel'], \
-			defaultButton='Continue', \
-			cancelButton='Cancel', \
-			dismissString='Cancel' )
-		if confirm == 'Continue':
-			for i in toImport:
-				resolvePath = os.path.join(abcPath,i+'.abc')
-				resolvePath = os.path.abspath(resolvePath)
-				# print resolvePath
-				cmds.file(resolvePath,r=True,type='Alembic',ignoreVersion=True,gl=True,ns=i)	
+		cmds.warning('No more animations to import')
+		return
+
+	# user prompt
+	confirm = cmds.confirmDialog(title='Import Shot animations', \
+		message='Found '+str(len(toImport))+' animation files to import. Continue ?', \
+		button=['Continue','Cancel'], \
+		defaultButton='Continue', \
+		cancelButton='Cancel', \
+		dismissString='Cancel' )
+
+	if confirm != 'Continue':
+		return
+
+	# begin import
+	for i in toImport:
+		resolvePath = os.path.join(abcPath,i+'.abc').replace(os.sep, '/')
+		cmds.file(resolvePath, \
+			r=True, \
+			type='Alembic', \
+			ignoreVersion=True, \
+			gl=True,\
+			ns=i)
+
+	# group imported geometries by namespace
+	for i in toImport:
+		try :
+			sel = cmds.select(i+':*',r=True)
+			sel = cmds.ls(selection=True,assemblies=True)
+		except ValueError :
+			pass
+
+		if not sel :
+			return
+
+		cmds.group(sel,n=i+'_grp')
+
+	# group under ANIM_GRP
+	if not cmds.objExists('ANIM_GRP') :
+		cmds.group(n='ANIM_GRP',empty=True)
+
+	for i in toImport :
+		cmds.parent(i+'_grp','ANIM_GRP')
 
 def importShaders(*args):
 	'''This will import the corresponding shaders for the imported animations'''
+
 	# List imported animations except if shader is already imported
 	imported = []
 	for i in deltaAbc :
@@ -159,6 +192,12 @@ def importShaders(*args):
 
 		resolvePath = '//Merlin/3d4/skid/04_asset/' + assetType + '/' + i + '/' + i + '_shd.ma'
 		check = os.path.exists(resolvePath)
+
+		# resolve path for propsOpponentsCar
+		if i.startswith('propsOpponentsCar') == True:
+			resolvePath = '//Merlin/3d4/skid/04_asset/props/propsOpponentsCar/propsOpponentsCar_shd.ma'
+		check = os.path.exists(resolvePath)
+
 
 		if not os.path.exists(resolvePath) :
 			cmds.warning('Could not find published shaders for '+i)
