@@ -165,3 +165,37 @@ def importAssetMa(asset,*args):
 		ignoreVersion=True, \
 		gl=True, \
 		ns=asset)
+
+def autoUpdateSetDress(*args):
+	'''This will update the current shot's set dress using maya standalone'''
+	import subprocess,glob
+
+	scenePath = cmds.workspace(sn=True,q=True)
+	scenePath = scenePath.replace(os.sep, '/')
+	shot = os.path.split(scenePath)[1]
+
+	maPublish = '%s/geo/%s_setDress.ma'%(scenePath,shot)
+	sceneFile = glob.glob(scenePath+r'/mayaScenes/setDress/'+shot+r'_*_v*.ma')[-1]
+
+	if not sceneFile :
+		cmds.error('Cant find setDress scene file')
+
+	if os.path.exists(maPublish):
+		try :
+			os.rename(maPublish,maPublish)
+		except WindowsError, e :
+			cmds.error(maPublish.split("/")[1] +' is already open in another application and cant be replaced.')
+			return
+
+	if os.path.exists(maPublish):
+		confirm = cmds.confirmDialog( title='Auto update set dress', \
+			message='This will replace any previously published setDress for this shot. Check your parameters :\n\nSET DRESS SCENE FILE :\n %s \n\nFILE TO PUBLISH : \n%s' %(sceneFile,maPublish), \
+			button=['Continue','Cancel'], \
+			defaultButton='Continue', \
+			cancelButton='Cancel', \
+			dismissString='Cancel' )
+		if confirm != 'Continue':
+			return
+
+	script = '//Merlin/3d4/skid/09_dev/toolScripts/publish/mayapy/updateSetDress.py'
+	subprocess.Popen(['mayapy',script,shot])

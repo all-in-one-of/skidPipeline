@@ -95,6 +95,10 @@ def CreateUI(*args):
 							c='import setDressTools; \
 							reload(setDressTools); \
 							setDressTools.publishSetDressGPU()')
+						button(l='Auto update set dress', \
+							c='import setDressTools; \
+							reload(setDressTools); \
+							setDressTools.autoUpdateSetDress()')
 				
 				with frameLayout('Nomenclatures'):
 					button(l='Afficher nomenclatures', \
