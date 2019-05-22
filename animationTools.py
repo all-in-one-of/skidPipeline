@@ -119,7 +119,7 @@ def playblastAnim(publish,*args):
 			percent=100, \
 			compression="H.264", \
 			quality=100, \
-			widthHeight=[2048,858])
+			widthHeight=[1024,429])
 	else :
 		cmds.playblast(format="image", \
 			filename=playblastPath, \
